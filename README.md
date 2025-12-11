@@ -1,6 +1,6 @@
 # Liferay 6.2 User Creator (Standalone)
 
-This small Java console application calls the Liferay 6.2 JSON web service endpoint directly to create a new user without using any Liferay SDK or portal dependencies. It uses only the standard Java HTTP client (no external libraries).
+This small Java console application writes directly to the Liferay database to create a new user without using any Liferay portal APIs or SDK dependencies. It uses plain JDBC to update the `Counter`, `User_`, and `Contact_` tables.
 
 ## Build
 
@@ -14,27 +14,26 @@ The assembled JAR will be in `build/libs/`.
 
 ## Run
 
-Pass user details and admin credentials as `--key=value` pairs. Required parameters are marked below.
+Pass user details, database connection information, and optional metadata as `--key=value` pairs. Required parameters are marked below.
 
 ```bash
 java -jar build/libs/liferay-user-service.jar \
-  --serverUrl=http://localhost:8080 \
-  --adminUser=test@liferay.com \
-  --adminPassword=admin \
+  --dbUrl=jdbc:mysql://localhost:3306/lportal \
+  --dbUser=liferay \
+  --dbPassword=secret \
   --companyId=20116 \
   --email=new.user@example.com \
   --firstName=New \
   --lastName=User \
   --userPassword=changeit \
-  --jobTitle=Developer \
-  --groupIds=20121,20122 \
-  --sendEmail=false
+  --screenName=newuser \
+  --jobTitle=Developer
 ```
 
-The app posts to `/api/jsonws/user/add-user` using HTTP basic authentication. You can provide optional fields such as `screenName`, `jobTitle`, `locale`, or membership ids (`groupIds`, `organizationIds`, `roleIds`, `userGroupIds`). Omit `screenName` to let Liferay auto-generate it; `sendEmail` controls whether the welcome email is sent.
+The app increments the `Counter` table to reserve identifiers, inserts a row into `User_`, and then adds the corresponding `Contact_` entry. It defaults the password to a SHA-256 hash, marks the account as approved, and fills optional metadata with safe defaults.
 
 ## Notes
 
-- The `companyId` and membership ids must match values from your target portal.
+- The `companyId` must match values from your target portal. `Counter`, `User_`, and `Contact_` schema requirements can vary by Liferay release; adjust the SQL if your deployment differs.
 - Birth date defaults to 1 January 1990. Override with `--birthdayMonth`, `--birthdayDay`, and `--birthdayYear` if needed.
-- The application intentionally avoids any Liferay libraries or helpers; it builds the form body manually and sends it over HTTPS/HTTP.
+- The application intentionally avoids any Liferay libraries or helpers; it relies on standard JDBC and SQL. Include your database driver in the runtime classpath if different from MySQL.

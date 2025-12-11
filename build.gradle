@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    // No external dependencies are required. The application uses the standard Java HTTP client.
+    // The application uses JDBC directly; include your database driver on the classpath when running.
 }
 
 application {
