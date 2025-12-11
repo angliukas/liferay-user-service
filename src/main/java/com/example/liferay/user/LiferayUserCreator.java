@@ -97,6 +97,10 @@ public class LiferayUserCreator {
 
                 insertUser(connection, options, userId, contactId);
                 insertContact(connection, options, userId, contactId);
+                long crmRoleId = findRoleId(connection,
+                        Long.parseLong(options.get("companyId")), "CRM_USER");
+                assignRoleToUser(connection, userId, crmRoleId);
+                assignUserToOrganization(connection, userId, 1056L);
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
@@ -260,6 +264,39 @@ public class LiferayUserCreator {
             }
         }
         throw new SQLException("classNameId not found for " + className + " in ClassName_ table");
+    }
+
+    private static long findRoleId(Connection connection, long companyId, String roleName) throws SQLException {
+        String query = "SELECT roleId FROM Role_ WHERE companyId = ? AND name = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, companyId);
+            ps.setString(2, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+        }
+        throw new SQLException("roleId not found for " + roleName + " in Role_ table");
+    }
+
+    private static void assignRoleToUser(Connection connection, long userId, long roleId) throws SQLException {
+        String sql = "INSERT INTO Users_Roles (userId, roleId) VALUES (?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setLong(2, roleId);
+            ps.executeUpdate();
+        }
+    }
+
+    private static void assignUserToOrganization(Connection connection, long userId, long organizationId)
+            throws SQLException {
+        String sql = "INSERT INTO Users_Orgs (organizationId, userId) VALUES (?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, organizationId);
+            ps.setLong(2, userId);
+            ps.executeUpdate();
+        }
     }
 
     private static String sha256(String input) {

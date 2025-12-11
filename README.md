@@ -32,6 +32,8 @@ java -jar build/libs/liferay-user-service.jar \
 
 The app increments the `Counter` table to reserve identifiers, inserts a row into `User_`, and then adds the corresponding `Contact_` entry. It defaults the password to a SHA-256 hash, marks the account as approved, and fills optional metadata with safe defaults.
 
+After creation, the tool also assigns the user to the `CRM_USER` role for the provided company and associates the account with organization ID `1056`.
+
 ## Notes
 
 - The `companyId` must match values from your target portal. `Counter`, `User_`, and `Contact_` schema requirements can vary by Liferay release; adjust the SQL if your deployment differs.
