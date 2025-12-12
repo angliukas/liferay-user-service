@@ -34,6 +34,22 @@ The app increments the `Counter` table to reserve identifiers, inserts a row int
 
 After creation, the tool also assigns the user to the `CRM_USER` role for the provided company and associates the account with organization ID `1056`.
 
+To associate the new account with additional roles or organizations, pass comma-separated ID lists. For example:
+
+```bash
+java -jar build/libs/liferay-user-service.jar \
+  --dbUrl=jdbc:mysql://localhost:3306/lportal \
+  --dbUser=liferay \
+  --dbPassword=secret \
+  --companyId=20116 \
+  --email=new.user@example.com \
+  --firstName=New \
+  --lastName=User \
+  --userPassword=changeit \
+  --roleIds=20125,20126 \
+  --organizationIds=1056,2042
+```
+
 ## Notes
 
 - The `companyId` must match values from your target portal. `Counter`, `User_`, and `Contact_` schema requirements can vary by Liferay release; adjust the SQL if your deployment differs.

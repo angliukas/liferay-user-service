@@ -80,7 +80,10 @@ public class LiferayUserCreator {
                 "  --roleIds=<comma-separated-ids>\n" +
                 "  --userGroupIds=<comma-separated-ids>\n" +
                 "  --sendEmail=<true|false>\n" +
-                "  --middleName=<middle-name>");
+                "  --middleName=<middle-name>\n\n" +
+                "Examples:\n" +
+                "  Assign additional roles: --roleIds=20125,20126\n" +
+                "  Assign organizations: --organizationIds=1056,2042");
     }
 
     private static String createUser(Map<String, String> options) throws IOException, InterruptedException {
